@@ -1,0 +1,245 @@
+package com.mycompany.loginsystem;
+
+import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class LoginSystemApp {
+
+    // user details
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String cellphone;
+
+    static Scanner input = new Scanner(System.in);
+    static int totalHours = 0;
+
+    // check username
+    public boolean checkUserName(String username) {
+
+        if (username.contains("_") && username.length() <= 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // check password
+    public boolean checkPasswordComplexity(String password) {
+
+        if (password.length() < 8) {
+            return false;
+        }
+
+        boolean hasUpper = false;
+        boolean hasNumber = false;
+        boolean hasSpecial = false;
+
+        for (int i = 0; i < password.length(); i++) {
+
+            char ch = password.charAt(i);
+
+            if (Character.isUpperCase(ch)) {
+                hasUpper = true;
+            }
+            if (Character.isDigit(ch)) {
+                hasNumber = true;
+            }
+            if (!Character.isLetterOrDigit(ch)) {
+                hasSpecial = true;
+            }
+        }
+
+        return hasUpper && hasNumber && hasSpecial;
+    }
+
+    // check cellphone
+    public boolean checkCellphoneNumber(String cell) {
+
+        return cell.startsWith("+27") && cell.length() == 12;
+    }
+
+    // register
+    public String registerUser(String u, String p, String f, String l, String c) {
+
+        if (!checkUserName(u)) {
+            return "Invalid username";
+        }
+
+        if (!checkPasswordComplexity(p)) {
+            return "Invalid password";
+        }
+
+        if (!checkCellphoneNumber(c)) {
+            return "Invalid cellphone number";
+        }
+
+        username = u;
+        password = p;
+        firstName = f;
+        lastName = l;
+        cellphone = c;
+
+        return "Registration successful";
+    }
+
+    // login
+    public boolean loginUser(String u, String p) {
+
+        return u.equals(username) && p.equals(password);
+    }
+
+    public String loginMessage(boolean status) {
+
+        if (status) {
+            return "Welcome " + firstName + " " + lastName;
+        } else {
+            return "Login failed";
+        }
+    }
+
+    // task check
+    public boolean checkDescription(String desc) {
+
+        return desc.length() <= 50;
+    }
+
+    // task id
+    public String createTaskID(String name, int num, String dev) {
+
+        String first = name.substring(0,2).toUpperCase();
+        String last = dev.substring(dev.length()-3).toUpperCase();
+
+        return first + ":" + num + ":" + last;
+    }
+
+    // create task json
+    public JSONObject createTask(String name, String desc, String dev,
+                                 int hours, String status, int num) {
+
+        String id = createTaskID(name, num, dev);
+
+        JSONObject obj = new JSONObject();
+
+        obj.put("Name", name);
+        obj.put("Description", desc);
+        obj.put("Developer", dev);
+        obj.put("Hours", hours);
+        obj.put("Status", status);
+        obj.put("ID", id);
+
+        totalHours += hours;
+
+        return obj;
+    }
+
+    public int getTotalHours() {
+        return totalHours;
+    }
+
+    // MAIN METHOD
+    public static void main(String[] args) {
+
+        LoginSystemApp app = new LoginSystemApp();
+        JSONArray tasks = new JSONArray();
+
+        System.out.println("=== Registration ===");
+
+        System.out.print("Username: ");
+        String u = input.nextLine();
+
+        System.out.print("Password: ");
+        String p = input.nextLine();
+
+        System.out.print("First name: ");
+        String f = input.nextLine();
+
+        System.out.print("Last name: ");
+        String l = input.nextLine();
+
+        System.out.print("Cellphone: ");
+        String c = input.nextLine();
+
+        String reg = app.registerUser(u,p,f,l,c);
+        System.out.println(reg);
+
+        if (reg.equals("Registration successful")) {
+
+            System.out.println("\n=== Login ===");
+
+            System.out.print("Username: ");
+            String lu = input.nextLine();
+
+            System.out.print("Password: ");
+            String lp = input.nextLine();
+
+            boolean login = app.loginUser(lu,lp);
+            System.out.println(app.loginMessage(login));
+
+            if (login) {
+
+                System.out.println("\n=== Tasks ===");
+
+                System.out.print("How many tasks: ");
+                int amount = input.nextInt();
+                input.nextLine();
+
+                for (int i = 0; i < amount; i++) {
+
+                    System.out.println("\nTask " + (i+1));
+
+                    System.out.print("Task name: ");
+                    String name = input.nextLine();
+
+                    System.out.print("Description: ");
+                    String desc = input.nextLine();
+
+                    System.out.print("Developer: ");
+                    String dev = input.nextLine();
+
+                    System.out.print("Hours: ");
+                    int hours = input.nextInt();
+                    input.nextLine();
+
+                    System.out.println("1.To Do 2.Done 3.Doing");
+                    int opt = input.nextInt();
+                    input.nextLine();
+
+                    String status = "";
+
+                    if (opt == 1) status = "To Do";
+                    else if (opt == 2) status = "Done";
+                    else status = "Doing";
+
+                    JSONObject task =
+                            app.createTask(name, desc, dev, hours, status, i);
+
+                    tasks.put(task);
+
+                    System.out.println(task.toString(4));
+                }
+
+                System.out.println("\nTotal Hours: " + app.getTotalHours());
+
+                try {
+
+                    FileWriter file = new FileWriter("tasks.json");
+                    file.write(tasks.toString(4));
+                    file.close();
+
+                    System.out.println("Saved to JSON");
+
+                } catch (IOException e) {
+                    System.out.println("Error saving file");
+                }
+            }
+        }
+
+        input.close();
+    }
+}
