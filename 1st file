@@ -1,0 +1,194 @@
+package com.mycompany.loginsystem;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class LoginSystem {
+
+    // variables for registration
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String cellphone;
+
+    // total task hours
+    int totalHours = 0;
+
+    // checking username
+    public boolean checkUserName(String username) {
+
+        if (username.contains("_") && username.length() <= 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // checking password
+    public boolean checkPasswordComplexity(String password) {
+
+        if (password.length() < 8) {
+            return false;
+        }
+
+        boolean hasCapital = false;
+        boolean hasNumber = false;
+        boolean hasSpecial = false;
+
+        // checking each character
+        for (int i = 0; i < password.length(); i++) {
+
+            char ch = password.charAt(i);
+
+            if (Character.isUpperCase(ch)) {
+                hasCapital = true;
+            }
+
+            if (Character.isDigit(ch)) {
+                hasNumber = true;
+            }
+
+            if (!Character.isLetterOrDigit(ch)) {
+                hasSpecial = true;
+            }
+        }
+
+        if (hasCapital && hasNumber && hasSpecial) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // checking cellphone number
+    public boolean checkCellphoneNumber(String cellphone) {
+
+        if (cellphone.startsWith("+27") && cellphone.length() == 12) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // register method
+    public String registerUser(String username, String password,
+                               String firstName, String lastName,
+                               String cellphone) {
+
+        if (!checkUserName(username)) {
+
+            return "Username is not correctly formatted.";
+
+        }
+
+        if (!checkPasswordComplexity(password)) {
+
+            return "Password is not correctly formatted.";
+
+        }
+
+        if (!checkCellphoneNumber(cellphone)) {
+
+            return "Cellphone number incorrectly formatted.";
+
+        }
+
+        // saving details
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.cellphone = cellphone;
+
+        return "User registered successfully.";
+    }
+
+    // login method
+    public boolean loginUser(String username, String password) {
+
+        if (username.equals(this.username)
+                && password.equals(this.password)) {
+
+            return true;
+
+        } else {
+
+            return false;
+        }
+    }
+
+    // login message
+    public String returnLoginStatus(boolean status) {
+
+        if (status) {
+
+            return "Welcome "
+                    + firstName + " "
+                    + lastName;
+
+        } else {
+
+            return "Username or password incorrect.";
+        }
+    }
+
+    // checking task description
+    public boolean checkTaskDescription(String description) {
+
+        if (description.length() <= 50) {
+
+            return true;
+
+        } else {
+
+            return false;
+        }
+    }
+
+    // creating task id
+    public String createTaskID(String taskName,
+                               int number,
+                               String developer) {
+
+        String first =
+                taskName.substring(0, 2).toUpperCase();
+
+        String last =
+                developer.substring(
+                        developer.length() - 3
+                ).toUpperCase();
+
+        return first + ":" + number + ":" + last;
+    }
+
+    // adding task to json
+    public JSONObject createTask(String taskName,
+                                 String description,
+                                 String developer,
+                                 int hours,
+                                 String status,
+                                 int number) {
+
+        String taskID =
+                createTaskID(taskName, number, developer);
+
+        JSONObject obj = new JSONObject();
+
+        obj.put("Task Name", taskName);
+        obj.put("Description", description);
+        obj.put("Developer", developer);
+        obj.put("Hours", hours);
+        obj.put("Status", status);
+        obj.put("Task ID", taskID);
+
+        totalHours += hours;
+
+        return obj;
+    }
+
+    // getting total hours
+    public int returnTotalHours() {
+        return totalHours;
+    }
+}
