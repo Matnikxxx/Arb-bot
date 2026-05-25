@@ -1,0 +1,73 @@
+package com.mycompany.loginsystem;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoginSystemTest {
+
+    // username test
+    @Test
+    public void testUsername() {
+
+        LoginSystem user = new LoginSystem();
+
+        boolean result =
+                user.checkUserName("kyl_1");
+
+        assertTrue(result);
+    }
+
+    // password test
+    @Test
+    public void testPassword() {
+
+        LoginSystem user = new LoginSystem();
+
+        boolean result =
+                user.checkPasswordComplexity("Password1!");
+
+        assertTrue(result);
+    }
+
+    // cellphone test
+    @Test
+    public void testCellphone() {
+
+        LoginSystem user = new LoginSystem();
+
+        boolean result =
+                user.checkCellphoneNumber("+27831234567");
+
+        assertTrue(result);
+    }
+
+    // task description test
+    @Test
+    public void testDescription() {
+
+        LoginSystem user = new LoginSystem();
+
+        boolean result =
+                user.checkTaskDescription(
+                        "Create login feature"
+                );
+
+        assertTrue(result);
+    }
+
+    // task id test
+    @Test
+    public void testTaskID() {
+
+        LoginSystem user = new LoginSystem();
+
+        String result =
+                user.createTaskID(
+                        "Login",
+                        0,
+                        "Mike Smith"
+                );
+
+        assertEquals("LO:0:ITH", result);
+    }
+}
