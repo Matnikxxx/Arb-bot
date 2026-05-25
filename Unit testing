@@ -1,0 +1,43 @@
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class TaskSystemTest {
+
+    // test description that should pass
+    @Test
+    public void testTaskDescriptionSuccess() {
+
+        boolean result =
+                TaskSystem.checkTaskDescription(
+                        "Create login feature"
+                );
+
+        assertTrue(result);
+    }
+
+    // test description that should fail
+    @Test
+    public void testTaskDescriptionFail() {
+
+        boolean result =
+                TaskSystem.checkTaskDescription(
+                        "This description is definitely longer than fifty characters"
+                );
+
+        assertFalse(result);
+    }
+
+    // test task ID creation
+    @Test
+    public void testCreateTaskID() {
+
+        String result =
+                TaskSystem.createTaskID(
+                        "Login",
+                        0,
+                        "Mike Smith"
+                );
+
+        assertEquals("LO:0:ITH", result);
+    }
+}
