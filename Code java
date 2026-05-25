@@ -1,0 +1,137 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class TaskSystem {
+
+    static Scanner scanner = new Scanner(System.in);
+
+    static int totalHours = 0;
+
+    // checks task description length
+    public static boolean checkTaskDescription(String description) {
+
+        if (description.length() <= 50) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // creates task ID
+    public static String createTaskID(String taskName, int taskNumber, String developerDetails) {
+
+        String firstLetters = taskName.substring(0, 2).toUpperCase();
+
+        String lastLetters = developerDetails.substring(
+                developerDetails.length() - 3
+        ).toUpperCase();
+
+        return firstLetters + ":" + taskNumber + ":" + lastLetters;
+    }
+
+    public static void main(String[] args) {
+
+        JSONArray messagesArray = new JSONArray();
+
+        System.out.println("Welcome to EasyKanban");
+
+        System.out.print("How many tasks would you like to enter? ");
+        int numberOfTasks = scanner.nextInt();
+        scanner.nextLine();
+
+        for (int i = 0; i < numberOfTasks; i++) {
+
+            JSONObject taskObject = new JSONObject();
+
+            System.out.println("\nTask " + (i + 1));
+
+            System.out.print("Enter task name: ");
+            String taskName = scanner.nextLine();
+
+            System.out.print("Enter task description: ");
+            String taskDescription = scanner.nextLine();
+
+            // validate description
+            if (checkTaskDescription(taskDescription)) {
+
+                System.out.println("Task successfully captured");
+                taskObject.put("Description Message", "Task successfully captured");
+
+            } else {
+
+                System.out.println("Please enter a task description of less than 50 characters");
+                taskObject.put("Description Message", "Please enter a task description of less than 50 characters");
+            }
+
+            System.out.print("Enter developer details: ");
+            String developerDetails = scanner.nextLine();
+
+            System.out.print("Enter task duration: ");
+            int taskDuration = scanner.nextInt();
+            scanner.nextLine();
+
+            totalHours = totalHours + taskDuration;
+
+            System.out.println("\nSelect task status");
+            System.out.println("1. To Do");
+            System.out.println("2. Done");
+            System.out.println("3. Doing");
+
+            int statusOption = scanner.nextInt();
+            scanner.nextLine();
+
+            String taskStatus = "";
+
+            if (statusOption == 1) {
+                taskStatus = "To Do";
+            } else if (statusOption == 2) {
+                taskStatus = "Done";
+            } else if (statusOption == 3) {
+                taskStatus = "Doing";
+            }
+
+            // create task ID
+            String taskID = createTaskID(taskName, i, developerDetails);
+
+            // save task info into JSON object
+            taskObject.put("Task Number", i);
+            taskObject.put("Task Name", taskName);
+            taskObject.put("Task Description", taskDescription);
+            taskObject.put("Developer Details", developerDetails);
+            taskObject.put("Task Duration", taskDuration);
+            taskObject.put("Task Status", taskStatus);
+            taskObject.put("Task ID", taskID);
+
+            // add object to array
+            messagesArray.put(taskObject);
+
+            // display task details
+            System.out.println("\nTask Details");
+            System.out.println(taskObject.toString(4));
+        }
+
+        System.out.println("\nTotal Hours: " + totalHours);
+
+        // save JSON file
+        try {
+
+            FileWriter fileWriter = new FileWriter("tasks.json");
+
+            fileWriter.write(messagesArray.toString(4));
+
+            fileWriter.close();
+
+            System.out.println("Tasks successfully stored in JSON file.");
+
+        } catch (IOException error) {
+
+            System.out.println("Error saving JSON file.");
+        }
+
+        scanner.close();
+    }
+}
