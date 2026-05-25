@@ -1,0 +1,183 @@
+package com.mycompany.loginsystem;
+
+import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner scan = new Scanner(System.in);
+
+        LoginSystem user = new LoginSystem();
+
+        JSONArray tasks = new JSONArray();
+
+        // registration
+        System.out.println("=== Registration ===");
+
+        System.out.print("Enter username: ");
+        String username = scan.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = scan.nextLine();
+
+        System.out.print("Enter first name: ");
+        String firstName = scan.nextLine();
+
+        System.out.print("Enter last name: ");
+        String lastName = scan.nextLine();
+
+        System.out.print("Enter cellphone number: ");
+        String cellphone = scan.nextLine();
+
+        // calling register method
+        String message =
+                user.registerUser(
+                        username,
+                        password,
+                        firstName,
+                        lastName,
+                        cellphone
+                );
+
+        System.out.println(message);
+
+        // login section
+        if (message.equals("User registered successfully.")) {
+
+            System.out.println("\n=== Login ===");
+
+            System.out.print("Enter username: ");
+            String loginUsername = scan.nextLine();
+
+            System.out.print("Enter password: ");
+            String loginPassword = scan.nextLine();
+
+            boolean result =
+                    user.loginUser(
+                            loginUsername,
+                            loginPassword
+                    );
+
+            System.out.println(
+                    user.returnLoginStatus(result)
+            );
+
+            // part 2 starts here
+            if (result) {
+
+                System.out.println("\nWelcome to EasyKanban");
+
+                System.out.print("How many tasks do you want to add: ");
+                int amount = scan.nextInt();
+                scan.nextLine();
+
+                for (int i = 0; i < amount; i++) {
+
+                    System.out.println("\nTask " + (i + 1));
+
+                    // task name
+                    System.out.print("Enter task name: ");
+                    String taskName = scan.nextLine();
+
+                    // description
+                    System.out.print("Enter description: ");
+                    String description = scan.nextLine();
+
+                    if (user.checkTaskDescription(description)) {
+
+                        System.out.println("Task captured");
+
+                    } else {
+
+                        System.out.println("Description too long");
+                    }
+
+                    // developer
+                    System.out.print("Enter developer name: ");
+                    String developer = scan.nextLine();
+
+                    // task hours
+                    System.out.print("Enter task hours: ");
+                    int hours = scan.nextInt();
+                    scan.nextLine();
+
+                    // task status
+                    System.out.println("Choose task status");
+                    System.out.println("1. To Do");
+                    System.out.println("2. Done");
+                    System.out.println("3. Doing");
+
+                    int option = scan.nextInt();
+                    scan.nextLine();
+
+                    String status = "";
+
+                    if (option == 1) {
+
+                        status = "To Do";
+
+                    } else if (option == 2) {
+
+                        status = "Done";
+
+                    } else {
+
+                        status = "Doing";
+                    }
+
+                    // creating json task
+                    JSONObject task =
+                            user.createTask(
+                                    taskName,
+                                    description,
+                                    developer,
+                                    hours,
+                                    status,
+                                    i
+                            );
+
+                    tasks.put(task);
+
+                    // showing task
+                    System.out.println("\nTask Details");
+                    System.out.println(task.toString(4));
+                }
+
+                // showing total hours
+                System.out.println(
+                        "\nTotal Hours: "
+                                + user.returnTotalHours()
+                );
+
+                // saving json file
+                try {
+
+                    FileWriter file =
+                            new FileWriter("tasks.json");
+
+                    file.write(tasks.toString(4));
+
+                    file.close();
+
+                    System.out.println(
+                            "Tasks saved to JSON file."
+                    );
+
+                } catch (IOException e) {
+
+                    System.out.println(
+                            "Error saving file."
+                    );
+                }
+            }
+        }
+
+        scan.close();
+    }
+}
