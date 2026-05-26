@@ -1,0 +1,73 @@
+
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoginSystemAppTest {
+
+    // =========================
+    // TEST MESSAGE 1
+    // =========================
+    @Test
+    public void testMessage1() {
+
+        LoginSystemApp app = new LoginSystemApp();
+
+        // test recipient number
+        boolean numberCheck =
+                app.checkCellphoneNumber("+27718693002");
+
+        assertTrue(numberCheck);
+
+        // test message length
+        String message =
+                "Hi Mike, can you join us for dinner tonight";
+
+        assertTrue(message.length() <= 250);
+
+        // send option
+        String sendMessage = "Send";
+
+        assertEquals("Send", sendMessage);
+
+        // auto generated values
+        String messageHash = "00:0:MIK";
+        String messageID = "1001";
+
+        assertNotNull(messageHash);
+        assertNotNull(messageID);
+    }
+
+    // =========================
+    // TEST MESSAGE 2
+    // =========================
+    @Test
+    public void testMessage2() {
+
+        LoginSystemApp app = new LoginSystemApp();
+
+        // invalid recipient number
+        boolean numberCheck =
+                app.checkCellphoneNumber("08575975889");
+
+        assertFalse(numberCheck);
+
+        // test message length
+        String message =
+                "Hi Keegan, did you receive the payment?";
+
+        assertTrue(message.length() <= 250);
+
+        // discard option
+        String sendMessage = "Discard";
+
+        assertEquals("Discard", sendMessage);
+
+        // auto generated values
+        String messageHash = "00:1:KEE";
+        String messageID = "1002";
+
+        assertNotNull(messageHash);
+        assertNotNull(messageID);
+    }
+}
