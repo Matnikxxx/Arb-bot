@@ -1,0 +1,29 @@
+package com.mycompany.loginsystem;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoginSystemAppTest {
+
+    @Test
+    public void testValidCellphone() {
+
+        LoginSystemApp app = new LoginSystemApp();
+
+        boolean result =
+                app.checkCellphoneNumber("+27718693002");
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testInvalidCellphone() {
+
+        LoginSystemApp app = new LoginSystemApp();
+
+        boolean result =
+                app.checkCellphoneNumber("08575975889");
+
+        assertFalse(result);
+    }
+}
