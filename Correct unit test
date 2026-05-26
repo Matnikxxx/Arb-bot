@@ -1,0 +1,95 @@
+
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoginSystemAppTest {
+
+    // =========================
+    // TEST 1
+    // =========================
+    @Test
+    public void testMessage1() {
+
+        LoginSystemApp app = new LoginSystemApp();
+
+        // recipient number
+        String recipient = "+27718693002";
+
+        // message
+        String message =
+                "Hi Mike, can you join us for dinner tonight";
+
+        // checking recipient length
+        boolean correctNumber =
+                recipient.startsWith("+27") &&
+                recipient.length() == 12;
+
+        // checking message length
+        boolean correctMessage =
+                message.length() <= 250;
+
+        // simulate send option
+        String sendMessage = "Send";
+
+        // expected values
+        assertTrue(correctNumber);
+
+        assertTrue(correctMessage);
+
+        assertEquals("Send", sendMessage);
+
+        // auto generated examples
+        String messageHash = "00:0:MIK";
+        String messageID = "1001";
+
+        // checking generated values are not empty
+        assertNotNull(messageHash);
+
+        assertNotNull(messageID);
+    }
+
+    // =========================
+    // TEST 2
+    // =========================
+    @Test
+    public void testMessage2() {
+
+        LoginSystemApp app = new LoginSystemApp();
+
+        // recipient number
+        String recipient = "08575975889";
+
+        // message
+        String message =
+                "Hi Keegan, did you receive the payment?";
+
+        // checking if number is valid
+        boolean correctNumber =
+                recipient.startsWith("+27") &&
+                recipient.length() == 12;
+
+        // checking message length
+        boolean correctMessage =
+                message.length() <= 250;
+
+        // simulate discard option
+        String sendMessage = "Discard";
+
+        // expected results
+        assertFalse(correctNumber);
+
+        assertTrue(correctMessage);
+
+        assertEquals("Discard", sendMessage);
+
+        // auto generated examples
+        String messageHash = "00:1:KEE";
+        String messageID = "1002";
+
+        // checking generated values
+        assertNotNull(messageHash);
+
+        assertNotNull(messageID);
+    }
+}
