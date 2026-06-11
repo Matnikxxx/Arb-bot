@@ -1,0 +1,52 @@
+package com.mycompany.loginsystem;
+
+import java.util.Scanner;
+
+public class LoginSystemApp {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        LoginSystem user = new LoginSystem();
+
+        System.out.println("=== REGISTER ===");
+
+        System.out.print("Username: ");
+        String u = sc.nextLine();
+
+        System.out.print("Password: ");
+        String p = sc.nextLine();
+
+        System.out.print("First Name: ");
+        String f = sc.nextLine();
+
+        System.out.print("Last Name: ");
+        String l = sc.nextLine();
+
+        System.out.print("Cellphone: ");
+        String cell = sc.nextLine();
+
+        String reg = user.registerUser(u, p, f, l, cell);
+        System.out.println(reg);
+
+        if (!reg.equals("User successfully registered!")) return;
+
+        System.out.println("\n=== LOGIN ===");
+
+        System.out.print("Username: ");
+        String lu = sc.nextLine();
+
+        System.out.print("Password: ");
+        String lp = sc.nextLine();
+
+        boolean login = user.loginUser(lu, lp);
+        System.out.println(user.returnLoginStatus(login));
+
+        if (!login) return;
+
+        Message.setLoginStatus(true);
+
+        System.out.println("\nQuickChat System Active ✔");
+    }
+}
