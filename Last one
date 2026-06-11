@@ -1,0 +1,295 @@
+import java.util.Scanner;
+
+public class MainApp {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        // ================= LOGIN =================
+        LoginSystem user = new LoginSystem();
+
+        System.out.println("=== REGISTER ===");
+
+        System.out.print("Username: ");
+        String u = sc.nextLine();
+
+        System.out.print("Password: ");
+        String p = sc.nextLine();
+
+        System.out.print("First Name: ");
+        String f = sc.nextLine();
+
+        System.out.print("Last Name: ");
+        String l = sc.nextLine();
+
+        System.out.print("Cellphone: ");
+        String cell = sc.nextLine();
+
+        String reg = user.registerUser(u, p, f, l, cell);
+        System.out.println(reg);
+
+        if (!reg.equals("User successfully registered!")) {
+            return;
+        }
+
+        System.out.println("\n=== LOGIN ===");
+
+        System.out.print("Username: ");
+        String lu = sc.nextLine();
+
+        System.out.print("Password: ");
+        String lp = sc.nextLine();
+
+        boolean login = user.loginUser(lu, lp);
+        System.out.println(user.returnLoginStatus(login));
+
+        if (!login) return;
+
+        Message.setLoginStatus(true);
+
+        // ================= MESSAGE LIMIT =================
+        System.out.print("How many messages do you want to send? ");
+        int limit = sc.nextInt();
+        sc.nextLine();
+
+        int count = 0;
+
+        // ================= MENU LOOP =================
+        while (true) {
+
+            System.out.println("\n=== QUICKCHAT MENU ===");
+            System.out.println("1) Send Message");
+            System.out.println("2) Show recently sent messages");
+            System.out.println("3) Quit");
+
+            System.out.print("Choose: ");
+            int choice = sc.nextInt();
+            sc.nextLine();
+
+            if (choice == 1) {
+
+                if (count >= limit) {
+                    System.out.println("Message limit reached.");
+                    continue;
+                }
+
+                System.out.print("Message ID: ");
+                String id = sc.nextLine();
+
+                System.out.print("Recipient (+27...): ");
+                String rec = sc.nextLine();
+
+                System.out.print("Message: ");
+                String msgText = sc.nextLine();
+
+                Message msg = new Message(id, rec, msgText);
+
+                System.out.println(msg.validateMessage());
+                System.out.println(msg.checkRecipientCell());
+                System.out.println("Hash: " + msg.createMessageHash());
+
+                System.out.println("1 Send | 2 Discard | 3 Store JSON");
+                int action = sc.nextInt();
+                sc.nextLine();
+
+                String result = msg.sentMessage(action);
+                System.out.println(result);
+
+                if (action == 1) {
+                    count++;
+                    System.out.println("Total sent: " + count);
+                }
+
+            } 
+            else if (choice == 2) {
+                System.out.println("Coming Soon.");
+            } 
+            else if (choice == 3) {
+                System.out.println("Goodbye!");
+                break;
+            } 
+            else {
+                System.out.println("Invalid option");
+            }
+        }
+
+        sc.close();
+    }
+}
+
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SystemTest {
+
+    // ================= LOGIN TESTS =================
+
+    @Test
+    public void testValidUsername() {
+        LoginSystem ls = new LoginSystem();
+        assertTrue(ls.checkUserName("k_b"));
+    }
+
+    @Test
+    public void testInvalidUsername() {
+        LoginSystem ls = new LoginSystem();
+        assertFalse(ls.checkUserName("khanban"));
+    }
+
+    @Test
+    public void testValidPassword() {
+        LoginSystem ls = new LoginSystem();
+        assertTrue(ls.checkPasswordComplexity("Abc@1234"));
+    }
+
+    @Test
+    public void testInvalidPassword() {
+        LoginSystem ls = new LoginSystem();
+        assertFalse(ls.checkPasswordComplexity("abc123"));
+    }
+
+    @Test
+    public void testValidCellphone() {
+        LoginSystem ls = new LoginSystem();
+        assertTrue(ls.checkCellphoneNumber("+2781234567".substring(0, 12)));
+    }
+
+    @Test
+    public void testRegistrationSuccess() {
+        LoginSystem ls = new LoginSystem();
+
+        String result = ls.registerUser(
+                "k_b",
+                "Abc@1234",
+                "John",
+                "Doe",
+                "+2781234567"
+        );
+
+        assertEquals("User successfully registered!", result);
+    }
+
+    @Test
+    public void testLoginSuccess() {
+        LoginSystem ls = new LoginSystem();
+
+        ls.registerUser("k_b", "Abc@1234", "John", "Doe", "+2781234567");
+
+        assertTrue(ls.loginUser("k_b", "Abc@1234"));
+    }
+
+    @Test
+    public void testLoginFail() {
+        LoginSystem ls = new LoginSystem();
+
+        ls.registerUser("k_b", "Abc@1234", "John", "Doe", "+2781234567");
+
+        assertFalse(ls.loginUser("wrong", "wrong"));
+    }
+
+    // ================= MESSAGE TESTS =================
+
+    @Test
+    public void testMessageLengthValid() {
+        Message msg = new Message("123", "+2781234567", "Hello world");
+        assertEquals("Message ready to send.", msg.validateMessage());
+    }
+
+    @Test
+    public void testMessageLengthInvalid() {
+        String longMsg = new String(new char[260]).replace("\0", "a");
+
+        Message msg = new Message("123", "+2781234567", longMsg);
+
+        assertTrue(msg.validateMessage().contains("Message exceeds 250 characters"));
+    }
+
+    @Test
+    public void testRecipientValid() {
+        Message msg = new Message("123", "+2781234567", "Hello");
+
+        assertEquals(
+                "Cell phone number successfully captured.",
+                msg.checkRecipientCell()
+        );
+    }
+
+    @Test
+    public void testMessageIDCheck() {
+        Message msg = new Message("1234567890", "+2781234567", "Hi");
+        assertTrue(msg.checkMessageID());
+    }
+
+    @Test
+    public void testMessageHashGeneration() {
+
+        Message msg = new Message("12AB", "+2781234567", "Hi Mike how are you");
+        String hash = msg.createMessageHash();
+
+        assertNotNull(hash);
+        assertTrue(hash.contains("12"));
+        assertTrue(hash.contains("HIMIKE"));
+    }
+
+    @Test
+    public void testSendMessageRequiresLogin() {
+
+        Message.setLoginStatus(false);
+
+        Message msg = new Message("12", "+2781234567", "Hello");
+
+        assertEquals("ERROR: You must log in first.", msg.sentMessage(1));
+    }
+
+    @Test
+    public void testSendMessageSuccessAfterLogin() {
+
+        Message.setLoginStatus(true);
+
+        Message msg = new Message("12", "+2781234567", "Hello");
+
+        String result = msg.sentMessage(1);
+
+        assertEquals("Message successfully sent.", result);
+    }
+
+    @Test
+    public void testDiscardMessage() {
+
+        Message.setLoginStatus(true);
+
+        Message msg = new Message("12", "+2781234567", "Hello");
+
+        assertEquals("Press 0 to delete the message.", msg.sentMessage(2));
+    }
+
+    @Test
+    public void testStoreToJson() {
+
+        Message.setLoginStatus(true);
+
+        Message msg = new Message("12", "+2781234567", "Hello");
+
+        msg.createMessageHash();
+
+        String result = msg.sentMessage(3);
+
+        assertEquals("Message successfully stored in JSON file.", result);
+    }
+
+    @Test
+    public void testTotalMessagesCounter() {
+
+        Message.setLoginStatus(true);
+
+        Message msg1 = new Message("1", "+2781234567", "Hi");
+        Message msg2 = new Message("2", "+2781234567", "Hello");
+
+        msg1.sentMessage(1);
+        msg2.sentMessage(1);
+
+        assertTrue(msg2.returnTotalMessages() >= 2);
+    }
+}
