@@ -1,0 +1,227 @@
+package com.mycompany.loginsystem;
+
+public class LoginSystem {
+
+    String username;
+    String password;
+    String firstName;
+    String lastName;
+    String cellphone;
+
+    public boolean checkUserName(String username) {
+        return username.contains("_") && username.length() <= 5;
+    }
+
+    public boolean checkPasswordComplexity(String password) {
+
+        if (password.length() < 8) return false;
+
+        boolean upper = false;
+        boolean number = false;
+        boolean special = false;
+
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) upper = true;
+            if (Character.isDigit(c)) number = true;
+            if (!Character.isLetterOrDigit(c)) special = true;
+        }
+
+        return upper && number && special;
+    }
+
+    public boolean checkCellphoneNumber(String cellphone) {
+        return cellphone.startsWith("+27") && cellphone.length() == 12;
+    }
+
+    public String registerUser(String u, String p, String f, String l, String cell) {
+
+        if (!checkUserName(u)) return "Invalid username";
+        if (!checkPasswordComplexity(p)) return "Invalid password";
+        if (!checkCellphoneNumber(cell)) return "Invalid cellphone";
+
+        username = u;
+        password = p;
+        firstName = f;
+        lastName = l;
+        cellphone = cell;
+
+        return "User successfully registered!";
+    }
+
+    public boolean loginUser(String u, String p) {
+        return u.equals(username) && p.equals(password);
+    }
+
+    public String returnLoginStatus(boolean status) {
+        return status
+                ? "Welcome " + firstName + " " + lastName
+                : "Login failed";
+
+
+
+
+package com.mycompany.loginsystem;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Message {
+
+    private static boolean loggedIn = false;
+    private static int messageCount = 0;
+
+    private String messageID;
+    private String recipient;
+    private String message;
+    private String messageHash;
+
+    private static List<String> sentMessages = new ArrayList<>();
+
+    public static void setLoginStatus(boolean status) {
+        loggedIn = status;
+    }
+
+    public Message(String messageID, String recipient, String message) {
+        this.messageID = messageID;
+        this.recipient = recipient;
+        this.message = message;
+    }
+
+    public boolean checkMessageID() {
+        return messageID.length() <= 10;
+    }
+
+    public String checkRecipientCell() {
+        if (recipient.startsWith("+27") && recipient.length() <= 13) {
+            return "Cell phone number successfully captured.";
+        }
+        return "Invalid cellphone format";
+    }
+
+    public String validateMessage() {
+        if (message.length() > 250) {
+            return "Message exceeds 250 characters";
+        }
+        return "Message ready to send.";
+    }
+
+    public String createMessageHash() {
+
+        String[] words = message.trim().split("\\s+");
+
+        String first = words[0].toUpperCase();
+        String last = words[words.length - 1].toUpperCase();
+
+        String idPart = messageID.length() >= 2 ? messageID.substring(0, 2) : messageID;
+
+        messageHash = idPart + ":" + messageCount + ":" + first + last;
+
+        return messageHash;
+    }
+
+    public String sentMessage(int choice) {
+
+        if (!loggedIn) {
+            return "ERROR: Login required";
+        }
+
+        messageCount++;
+
+        switch (choice) {
+            case 1:
+                sentMessages.add(message);
+                return "Message successfully sent.";
+
+            case 2:
+                return "Press 0 to delete the message.";
+
+            case 3:
+                MessageStore.save(messageID + ":" + recipient + ":" + message);
+                return "Message successfully stored.";
+
+            default:
+                return "Invalid option";
+        }
+    }
+
+    public int returnTotalMessages() {
+        return messageCount;
+
+
+
+
+package com.mycompany.loginsystem;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class MessageStore {
+
+    public static void save(String data) {
+
+        try (FileWriter fw = new FileWriter("messages.json", true)) {
+            fw.write(data + "\n");
+        } catch (IOException e) {
+            System.out.println("File error");
+        }
+    }
+}
+
+
+
+
+
+
+
+
+    }
+}
+    }
+}
+
+
+
+
+
+package com.mycompany.loginsystem;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoginSystemAppTest {
+
+    @Test
+    public void testUsernameValid() {
+        LoginSystem ls = new LoginSystem();
+        assertTrue(ls.checkUserName("k_b"));
+    }
+
+    @Test
+    public void testPasswordValid() {
+        LoginSystem ls = new LoginSystem();
+        assertTrue(ls.checkPasswordComplexity("Abc@1234"));
+    }
+
+    @Test
+    public void testLoginFail() {
+        LoginSystem ls = new LoginSystem();
+        ls.registerUser("k_b", "Abc@1234", "John", "Doe", "+271234567890");
+        assertFalse(ls.loginUser("wrong", "wrong"));
+    }
+
+    @Test
+    public void testLoginSuccess() {
+        LoginSystem ls = new LoginSystem();
+        ls.registerUser("k_b", "Abc@1234", "John", "Doe", "+271234567890");
+        assertTrue(ls.loginUser("k_b", "Abc@1234"));
+    }
+
+    @Test
+    public void testMessageSendRequiresLogin() {
+        Message.setLoginStatus(false);
+
+        Message msg = new Message("12", "+271234567890", "Hello");
+
+        assertEquals("ERROR: Login required", msg.sentMessage(1));
+    }
+}
