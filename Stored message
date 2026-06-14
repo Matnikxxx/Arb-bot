@@ -1,0 +1,16 @@
+package login;
+
+public class StoredMessage {
+
+    String messageId;
+    String recipient;
+    String message;
+    String status;
+
+    public StoredMessage(String messageId, String recipient, String message, String status) {
+        this.messageId = messageId;
+        this.recipient = recipient;
+        this.message = message;
+        this.status = status;
+    }
+}
