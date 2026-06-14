@@ -1,0 +1,51 @@
+package login;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoginSystemTest {
+
+    LoginSystemApplication app = new LoginSystemApplication();
+
+    @Test
+    public void testUsername() {
+        assertTrue(app.checkUserName("kyl_1"));
+    }
+
+    @Test
+    public void testPassword() {
+        assertTrue(app.checkPasswordComplexity("Ch&&sec@ke99!"));
+    }
+
+    @Test
+    public void testCell() {
+        assertTrue(app.checkCellphoneNumber("+27838968976"));
+    }
+
+    @Test
+    public void testMessageValidationSuccess() {
+        assertEquals("Message ready to send.",
+                app.validateMessage("Hello world"));
+    }
+
+    @Test
+    public void testMessageValidationFailure() {
+        String longMsg = "x".repeat(260);
+        assertTrue(app.validateMessage(longMsg).contains("Message exceeds"));
+    }
+
+    @Test
+    public void testLongestMessage() {
+
+        app.addMessage("+27", "Hi", "Sent");
+        app.addMessage("+27", "This is the longest stored message", "Stored");
+
+        assertEquals("This is the longest stored message",
+                app.longestMessage());
+    }
+
+    @Test
+    public void testDeleteHash() {
+        assertFalse(app.deleteByHash("WRONG"));
+    }
+}
