@@ -1,0 +1,79 @@
+public static void main(String[] args) {
+
+    java.util.Scanner scanner = new java.util.Scanner(System.in);
+    LoginSystemApplication app = new LoginSystemApplication();
+
+    System.out.println("=================================");
+    System.out.println("       WELCOME TO QUICKCHAT");
+    System.out.println("=================================");
+
+    // ================= REGISTER =================
+    System.out.print("Enter username: ");
+    String username = scanner.nextLine();
+
+    System.out.print("Enter password: ");
+    String password = scanner.nextLine();
+
+    System.out.print("Enter first name: ");
+    String firstName = scanner.nextLine();
+
+    System.out.print("Enter last name: ");
+    String lastName = scanner.nextLine();
+
+    System.out.print("Enter cellphone number: ");
+    String cell = scanner.nextLine();
+
+    System.out.println(app.registerUser(username, password, firstName, lastName, cell));
+
+    // ================= LOGIN =================
+    System.out.println("\nLOGIN");
+
+    System.out.print("Enter username: ");
+    String loginUser = scanner.nextLine();
+
+    System.out.print("Enter password: ");
+    String loginPass = scanner.nextLine();
+
+    boolean login = app.loginUser(loginUser, loginPass);
+    System.out.println(app.returnLoginStatus(login));
+
+    if (!login) {
+        System.out.println("Exiting system...");
+        return;
+    }
+
+    // ================= SIMPLE MENU =================
+    int choice;
+
+    do {
+        System.out.println("\n===== MENU =====");
+        System.out.println("1. Add Message");
+        System.out.println("2. View All Messages");
+        System.out.println("3. Exit");
+
+        System.out.print("Choose option: ");
+        choice = scanner.nextInt();
+        scanner.nextLine();
+
+        if (choice == 1) {
+
+            System.out.print("Enter recipient: ");
+            String recipient = scanner.nextLine();
+
+            System.out.print("Enter message: ");
+            String message = scanner.nextLine();
+
+            System.out.print("Enter status (Sent/Stored/Disregard): ");
+            String status = scanner.nextLine();
+
+            app.addMessage(recipient, message, status);
+        }
+
+        if (choice == 2) {
+            System.out.println(app.displayAllMessages());
+        }
+
+    } while (choice != 3);
+
+    System.out.println("Goodbye!");
+}
