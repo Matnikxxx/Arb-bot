@@ -1,0 +1,17 @@
+
+
+    // ================= MAIN METHOD =================
+
+    public static void main(String[] args) {
+
+        LoginSystemApplication app = new LoginSystemApplication();
+
+        System.out.println("=================================");
+        System.out.println("       WELCOME TO QUICKCHAT");
+        System.out.println("=================================");
+
+        System.out.println("Application started successfully.");
+
+    }
+
+}
