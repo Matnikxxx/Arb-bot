@@ -1,0 +1,79 @@
+package login;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class LoginSystemTest {
+
+    LoginSystemApplication app = new LoginSystemApplication();
+
+    // ================= PART 1 TESTS =================
+
+    @Test
+    public void testValidUsername() {
+        assertTrue(app.checkUserName("kyl_1"));
+    }
+
+    @Test
+    public void testInvalidUsername() {
+        assertFalse(app.checkUserName("kyle!!!!"));
+    }
+
+    @Test
+    public void testValidPassword() {
+        assertTrue(app.checkPasswordComplexity("Ch&&sec@ke99!"));
+    }
+
+    @Test
+    public void testInvalidPassword() {
+        assertFalse(app.checkPasswordComplexity("password"));
+    }
+
+    @Test
+    public void testValidCellphone() {
+        assertTrue(app.checkCellphoneNumber("+27838968976"));
+    }
+
+    @Test
+    public void testInvalidCellphone() {
+        assertFalse(app.checkCellphoneNumber("08966553"));
+    }
+
+    // ================= PART 2 TESTS =================
+
+    @Test
+    public void testMessageValidationSuccess() {
+        assertEquals("Message ready to send.",
+                app.validateMessage("Hello there"));
+    }
+
+    @Test
+    public void testMessageValidationFailure() {
+
+        String longMessage = new String(new char[260]).replace("\0", "x");
+
+        assertTrue(app.validateMessage(longMessage)
+                .contains("Message exceeds"));
+    }
+
+    @Test
+    public void testMessageIdGeneration() {
+        String id = app.createMessageId("Hi Mike", 1);
+        assertTrue(id.startsWith("HI"));
+    }
+
+    @Test
+    public void testMessageHashGeneration() {
+        String hash = app.createMessageHash("HI1", "Hello Mike");
+        assertTrue(hash.contains("HELLO"));
+    }
+
+    // ================= PART 3 TESTS =================
+
+    @Test
+    public void testDeleteMessage() {
+        app.deleteByHash("INVALID_HASH");
+        assertEquals("Message hash not found.", app.deleteByHash("INVALID_HASH"));
+    }
+
+}
