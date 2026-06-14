@@ -1,0 +1,478 @@
+package login;
+
+import java.util.Scanner;
+
+public class LoginSystemApplication {
+
+    // ================= USER DETAILS =================
+
+    private String userName;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String cellNumber;
+
+    // ================= VALIDATE USERNAME =================
+
+    public boolean checkUserName(String userName) {
+
+        if (userName.contains("_") && userName.length() <= 5) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    // ================= VALIDATE PASSWORD =================
+
+    public boolean checkPasswordComplexity(String password) {
+
+        if (password.length() < 8) {
+            return false;
+        }
+
+        boolean capitalLetter = false;
+        boolean number = false;
+        boolean specialCharacter = false;
+
+        for (int i = 0; i < password.length(); i++) {
+
+            char currentCharacter = password.charAt(i);
+
+            if (Character.isUpperCase(currentCharacter)) {
+                capitalLetter = true;
+            }
+
+            if (Character.isDigit(currentCharacter)) {
+                number = true;
+            }
+
+            if (!Character.isLetterOrDigit(currentCharacter)) {
+                specialCharacter = true;
+            }
+
+        }
+
+        return capitalLetter && number && specialCharacter;
+
+    }
+
+    // ================= VALIDATE CELLPHONE =================
+
+    public boolean checkCellphoneNumber(String cellNumber) {
+
+        if (cellNumber.startsWith("+27") && cellNumber.length() == 12) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    // ================= REGISTER USER =================
+
+    public String registerUser(String userName,
+                               String password,
+                               String firstName,
+                               String lastName,
+                               String cellNumber) {
+
+        if (!checkUserName(userName)) {
+
+            return "Username is not correctly formatted; please ensure it contains an underscore and is no more than five characters.";
+
+        }
+
+        if (!checkPasswordComplexity(password)) {
+
+            return "Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter, a number, and a special character.";
+
+        }
+
+        if (!checkCellphoneNumber(cellNumber)) {
+
+            return "Cell number is incorrectly formatted or does not contain an international code.";
+
+        }
+
+        this.userName = userName;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.cellNumber = cellNumber;
+
+        return "User has been registered successfully.";
+
+    }
+
+    // ================= LOGIN =================
+
+    public boolean loginUser(String userName, String password) {
+
+        return userName.equals(this.userName)
+                && password.equals(this.password);
+
+    }
+
+    // ================= LOGIN MESSAGE =================
+
+    public String returnLoginStatus(boolean loginStatus) {
+
+        if (loginStatus) {
+
+            return "Welcome "
+                    + firstName
+                    + ", "
+                    + lastName
+                    + " it is great to see you.";
+
+        } else {
+
+            return "Username or password incorrect, please try again.";
+
+        }
+
+    }
+
+    // ================= MAIN METHOD =================
+
+    public static void main(String[] args) {
+
+        Scanner keyboard = new Scanner(System.in);
+
+        LoginSystemApplication application =
+                new LoginSystemApplication();
+
+        System.out.println("====================================");
+        System.out.println("          QUICKCHAT SYSTEM          ");
+        System.out.println("====================================");
+
+        // ---------- REGISTRATION ----------
+
+        System.out.println("\nREGISTER USER");
+
+        System.out.print("Enter username: ");
+        String userName = keyboard.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = keyboard.nextLine();
+
+        System.out.print("Enter first name: ");
+        String firstName = keyboard.nextLine();
+
+        System.out.print("Enter last name: ");
+        String lastName = keyboard.nextLine();
+
+        System.out.print("Enter cellphone number: ");
+        String cellNumber = keyboard.nextLine();
+
+        String registrationResult =
+                application.registerUser(
+                        userName,
+                        password,
+                        firstName,
+                        lastName,
+                        cellNumber);
+
+        System.out.println();
+        System.out.println(registrationResult);
+
+        // ---------- LOGIN ----------
+
+        if (registrationResult.equals("User has been registered successfully.")) {
+
+            System.out.println("\nLOGIN");
+
+            System.out.print("Username: ");
+            String loginUserName = keyboard.nextLine();
+
+            System.out.print("Password: ");
+            String loginPassword = keyboard.nextLine();
+
+            boolean loginSuccessful =
+                    application.loginUser(
+                            loginUserName,
+                            loginPassword);
+
+            System.out.println();
+            System.out.println(
+                    application.returnLoginStatus(loginSuccessful));
+
+            if (loginSuccessful) {
+
+                System.out.println();
+                System.out.println("QuickChat is ready.");
+                System.out.println("Part 2 menu will be added next.");
+
+            }
+
+        }
+
+        keyboard.close();
+
+
+
+
+    }
+
+}
+
+
+// ================= MESSAGE ARRAYS =================
+
+private String[] sentMessages = new String[100];
+private String[] storedMessages = new String[100];
+private String[] disregardedMessages = new String[100];
+
+private String[] messageIds = new String[100];
+private String[] messageHashes = new String[100];
+
+private int sentCount = 0;
+private int storedCount = 0;
+private int disregardedCount = 0;
+
+private int messageIdCount = 0;
+private int messageHashCount = 0;
+
+
+
+// ================= MESSAGE VALIDATION =================
+
+public String validateMessage(String message) {
+
+    if (message.length() <= 250) {
+        return "Message ready to send.";
+    } else {
+        return "Message exceeds 250 characters by "
+                + (message.length() - 250);
+    }
+}
+
+
+// ================= MESSAGE ID =================
+
+public String createMessageId(String message, int count) {
+
+    String firstTwoLetters = message.length() >= 2
+            ? message.substring(0, 2).toUpperCase()
+            : message.toUpperCase();
+
+    return firstTwoLetters + count;
+}
+
+
+
+
+// ================= MESSAGE HASH =================
+
+public String createMessageHash(String messageId, String message) {
+
+    String[] words = message.split(" ");
+
+    String firstWord = words[0].toUpperCase();
+    String lastWord = words[words.length - 1].toUpperCase();
+
+    return messageId + ":" + firstWord + lastWord;
+}
+
+
+
+
+// ================= MESSAGE MENU SYSTEM =================
+
+public void messageMenu() {
+
+    java.util.Scanner keyboard = new java.util.Scanner(System.in);
+
+    System.out.println("\n========== QUICKCHAT MENU ==========");
+    System.out.println("1. Send Message");
+    System.out.println("2. Store Message");
+    System.out.println("3. Disregard Message");
+    System.out.println("====================================");
+
+    System.out.print("How many messages do you want to enter: ");
+    int numberOfMessages = keyboard.nextInt();
+    keyboard.nextLine();
+
+    // FOR LOOP (REQUIRED BY RUBRIC)
+    for (int i = 0; i < numberOfMessages; i++) {
+
+        System.out.println("\nEnter message " + (i + 1));
+
+        System.out.print("Enter recipient number: ");
+        String recipient = keyboard.nextLine();
+
+        System.out.print("Enter message: ");
+        String message = keyboard.nextLine();
+
+        System.out.println("\nSelect option (1-3): ");
+        int choice = keyboard.nextInt();
+        keyboard.nextLine();
+
+        // validate message
+        System.out.println(validateMessage(message));
+
+        // create ID + HASH
+        String messageId = createMessageId(message, messageIdCount++);
+        String messageHash = createMessageHash(messageId, message);
+
+        messageIds[messageIdCount - 1] = messageId;
+        messageHashes[messageHashCount++] = messageHash;
+
+        System.out.println("Message ID: " + messageId);
+        System.out.println("Message Hash: " + messageHash);
+
+        // ================= SWITCH SYSTEM =================
+
+        switch (choice) {
+
+            case 1:
+                sentMessages[sentCount++] = message;
+                System.out.println("Message successfully sent.");
+                break;
+
+            case 2:
+                storedMessages[storedCount++] = message;
+                System.out.println("Message successfully stored.");
+
+                // JSON SAVE (GSON)
+                saveToJson(messageId, recipient, message, "Stored");
+
+                break;
+
+            case 3:
+                disregardedMessages[disregardedCount++] = message;
+                System.out.println("Message disregarded.");
+                break;
+
+            default:
+                System.out.println("Invalid option selected.");
+        }
+    }
+
+    keyboard.close();
+}
+
+
+
+
+// ================= JSON STORAGE =================
+
+public void saveToJson(String id, String recipient, String message, String status) {
+
+    try (java.io.FileWriter writer = new java.io.FileWriter("messages.json", true)) {
+
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+
+        StoredMessage data = new StoredMessage(id, recipient, message, status);
+
+        writer.write(gson.toJson(data));
+        writer.write("\n");
+
+    } catch (Exception e) {
+        System.out.println("Error saving file.");
+    }
+}
+
+// ================= LONGEST MESSAGE =================
+
+public String longestStoredMessage() {
+
+    String longest = "";
+
+    for (int i = 0; i < storedCount; i++) {
+
+        if (storedMessages[i] != null &&
+            storedMessages[i].length() > longest.length()) {
+
+            longest = storedMessages[i];
+        }
+    }
+
+    return longest;
+}
+
+
+
+// ================= SEARCH BY RECIPIENT =================
+
+public String searchByRecipient(String recipient) {
+
+    String results = "";
+
+    for (int i = 0; i < storedCount; i++) {
+
+        if (storedMessages[i] != null) {
+            results += storedMessages[i] + "\n";
+        }
+    }
+
+    return results;
+}
+
+
+
+// ================= SEARCH BY MESSAGE ID =================
+
+public String searchByMessageId(String id) {
+
+    for (int i = 0; i < messageIdCount; i++) {
+
+        if (messageIds[i] != null && messageIds[i].equals(id)) {
+
+            return storedMessages[i];
+        }
+    }
+
+    return "Message not found.";
+}
+
+
+
+// ================= DELETE MESSAGE =================
+
+public String deleteByHash(String hash) {
+
+    for (int i = 0; i < messageHashCount; i++) {
+
+        if (messageHashes[i] != null &&
+            messageHashes[i].equals(hash)) {
+
+            messageHashes[i] = null;
+
+            return "Message successfully deleted.";
+        }
+    }
+
+    return "Message hash not found.";
+}
+
+
+// ================= FULL REPORT =================
+
+public String displayReport() {
+
+    String report = "";
+
+    report += "\n===== SENT MESSAGES =====\n";
+
+    for (int i = 0; i < sentCount; i++) {
+        report += sentMessages[i] + "\n";
+    }
+
+    report += "\n===== STORED MESSAGES =====\n";
+
+    for (int i = 0; i < storedCount; i++) {
+        report += storedMessages[i] + "\n";
+    }
+
+    report += "\n===== DISREGARDED MESSAGES =====\n";
+
+    for (int i = 0; i < disregardedCount; i++) {
+        report += disregardedMessages[i] + "\n";
+    }
+
+    return report;
+}
+
